@@ -1,0 +1,7 @@
+We are looking for an AI/ML Engineer with strong experience in Python, Machine Learning, Deep Learning, NLP, TensorFlow, PyTorch, and Scikit-learn.
+
+The candidate should have experience building Generative AI applications using Large Language Models, LangChain, RAG, Hugging Face Transformers, FAISS, and Sentence Transformers.
+
+Experience with SQL, REST APIs, Flask or FastAPI, Git, Docker, and cloud platforms such as AWS is preferred.
+
+Strong knowledge of data preprocessing, feature engineering, model evaluation, and hyperparameter tuning is required.

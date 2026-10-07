@@ -1,0 +1,15 @@
+[server]
+# Disables Streamlit's local source file watcher.
+#
+# On startup, the watcher walks every already-imported package (including
+# transformers' optional image-processing submodules) to decide what to
+# watch for hot-reload. Those submodules import torchvision, which this
+# app doesn't have installed (and doesn't need - it only uses transformers
+# for text embeddings). The watcher catches the resulting ImportErrors and
+# logs a full traceback for each one, which is what was flooding the
+# deploy logs. Turning the watcher off skips that walk entirely.
+#
+# This only affects local hot-reload during development. On Streamlit
+# Community Cloud, a new deploy already restarts the app on every push,
+# so there's no functional downside in production.
+fileWatcherType = "none"

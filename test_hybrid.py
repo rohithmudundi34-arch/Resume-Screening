@@ -11,7 +11,7 @@ from src.hybrid_scorer import calculate_hybrid_score
 
 
 # ============================================================
-# LOAD JOB DESCRIPTION
+# LOAD JOB DESCRIPTION 
 # ============================================================
 
 job_description = Path(

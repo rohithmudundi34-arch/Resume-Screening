@@ -1,44 +1,21 @@
-import os
-
-# Quiet transformers' architecture-registration log spam (the
-# "[ERROR] ... not documented" lines) — this is cosmetic noise from
-# importing transformers, not an actual error in your pipeline.
-os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
-os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
-
-try:
-    from sentence_transformers import SentenceTransformer
-except ImportError:
-    raise ImportError(
-        "sentence-transformers is required. "
-        "Install it with: pip install sentence-transformers"
-    )
-
 import streamlit as st
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-# Lightweight and strong general-purpose model
-MODEL_NAME = "all-MiniLM-L6-v2"
-
-
-@st.cache_resource(show_spinner="Loading semantic model (first run only)...")
-def get_semantic_model() -> "SentenceTransformer":
+@st.cache_resource
+def get_vectorizer():
     """
-    Load the sentence-transformer model exactly once per Streamlit
-    session/process instead of on every import or rerun.
-
-    local_files_only is tried first: once the model is cached on disk
-    (~/.cache/torch/sentence_transformers/... or the HF cache dir),
-    this skips the network round-trip to Hugging Face Hub that was
-    causing the "unauthenticated requests" warning and slowing down
-    every load. If it's not cached yet, we fall back to a normal
-    (networked) load, which will populate that cache for next time.
+    Lightweight text vectorizer.
+    Uses TF-IDF instead of Sentence Transformers so the
+    application can run within Render's 512 MB memory limit.
     """
-    try:
-        return SentenceTransformer(MODEL_NAME, local_files_only=True)
-    except Exception:
-        return SentenceTransformer(MODEL_NAME)
+    return TfidfVectorizer(
+        stop_words="english",
+        ngram_range=(1, 2),
+        max_features=5000,
+        sublinear_tf=True
+    )
 
 
 def calculate_semantic_scores(
@@ -46,42 +23,39 @@ def calculate_semantic_scores(
     resumes: list[str]
 ) -> list[float]:
     """
-    Calculate semantic similarity between
-    job description and multiple resumes.
+    Calculate text similarity between a job description
+    and multiple resumes.
 
     Returns scores from 0 to 100.
     """
 
-    model = get_semantic_model()
+    if not job_description or not resumes:
+        return [0.0] * len(resumes)
 
-    # Encode job description
-    job_embedding = model.encode(
-        [job_description],
-        normalize_embeddings=True
-    )
+    # Combine job description and resumes
+    documents = [job_description] + resumes
 
-    # Encode resumes
-    resume_embeddings = model.encode(
-        resumes,
-        normalize_embeddings=True
-    )
+    vectorizer = get_vectorizer()
 
-    # Cosine similarity
+    # Convert text into TF-IDF vectors
+    embeddings = vectorizer.fit_transform(documents)
+
+    # Job description vector
+    job_vector = embeddings[0:1]
+
+    # Resume vectors
+    resume_vectors = embeddings[1:]
+
+    # Calculate cosine similarity
     similarities = cosine_similarity(
-        job_embedding,
-        resume_embeddings
+        job_vector,
+        resume_vectors
     )[0]
 
-    # Convert similarity to 0-100
-    scores = []
-
-    for similarity in similarities:
-
-        # Cosine similarity can theoretically be -1 to 1
-        score = ((float(similarity) + 1) / 2) * 100
-
-        scores.append(
-            round(score, 2)
-        )
+    # Convert 0-1 similarity into 0-100 score
+    scores = [
+        round(float(similarity) * 100, 2)
+        for similarity in similarities
+    ]
 
     return scores

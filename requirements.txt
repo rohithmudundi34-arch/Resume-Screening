@@ -1,8 +1,7 @@
 streamlit==1.48.0
-plotly==6.3.0
-pymupdf
-sentence-transformers
+pandas
+numpy
 scikit-learn
 rank-bm25
-numpy
-pandas
+plotly==6.3.0
+pymupdf

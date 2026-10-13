@@ -122,6 +122,29 @@ st.markdown(
 
 
 
+    /* Streamlit top header / toolbar: force dark background */
+
+    header[data-testid="stHeader"],
+    [data-testid="stHeader"],
+    [data-testid="stHeader"] > div,
+    .stAppHeader,
+    .stAppHeader > div {
+        background: #080b11 !important;
+        background-color: #080b11 !important;
+        box-shadow: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+    }
+
+    [data-testid="stToolbar"],
+    [data-testid="stDecoration"],
+    [data-testid="stStatusWidget"] {
+        background: transparent !important;
+    }
+
+    [data-testid="stDecoration"] {
+        display: none !important;
+    }
+
     .stApp {
 
         background:
@@ -2804,7 +2827,7 @@ with st.sidebar:
 
     st.info(
 
-        "Upload up to 5 resumes. "
+        "Upload up to 10 resumes. "
 
         "Candidates are ranked using a hybrid AI scoring pipeline."
 
@@ -2962,13 +2985,13 @@ if uploaded_files:
 
 
 
-    if len(uploaded_files) > 5:
+    if len(uploaded_files) > 10:
 
 
 
         st.error(
 
-            "Maximum 5 resumes can be uploaded on the current server."
+            "Maximum 10 resumes can be uploaded."
 
         )
 
@@ -3084,13 +3107,13 @@ if analyze:
 
 
 
-    if len(uploaded_files) > 5:
+    if len(uploaded_files) > 10:
 
 
 
         st.error(
 
-            "Maximum 5 resumes are allowed on the current server."
+            "Maximum 10 resumes are allowed."
 
         )
 
